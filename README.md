@@ -2,7 +2,7 @@
 
 AWS Lambda関数のデモプロジェクトです。Datadog監視統合の実装例を含みます。
 
-## ? ファイル構成
+## ファイル構成
 
 | ファイル | 説明 |
 |---------|------|
@@ -10,7 +10,7 @@ AWS Lambda関数のデモプロジェクトです。Datadog監視統合の実装例を含みます。
 | `MockPIIAPI.py` | UDPでDatadogメトリクスを手動送信するモックAPI |
 | `MockPIIAPI_Tracer.py` | Datadog SDK自動トレーシング付きの拡張版 |
 
-## ? 機能詳細
+## 機能詳細
 
 ### HelloWorldDemo.py
 
@@ -50,7 +50,7 @@ Datadog公式SDKを使用した高度な監視機能付きバージョンです。
 - `lambda_metric()` による公式SDKメトリクス送信
 - カスタムSpanタグ（`request.id`, `generation.count`）
 
-## ? Datadog統合
+## Datadog統合
 
 ### 必要なDatadog Lambda Layer
 
@@ -69,7 +69,7 @@ arn:aws:lambda:<region>:464622532012:layer:Datadog-Extension:<layer_version>
 | `DD_ENV` | 環境名（production, staging等） |
 | `DD_TRACE_ENABLED` | トレース有効化（`true`/`false`） |
 
-## ?? デプロイ方法
+## デプロイ方法
 
 ### AWS CLIを使用する場合
 
@@ -100,7 +100,7 @@ Resources:
       MemorySize: 256
 ```
 
-## ? 使用例
+## 使用例
 
 ### Function URLでの呼び出し
 
@@ -131,6 +131,6 @@ curl "https://<function-url>/?count=10"
 }
 ```
 
-## ? ライセンス
+## ライセンス
 
 MIT License
