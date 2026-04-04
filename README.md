@@ -4,7 +4,7 @@
 
 ## English
 
-# Lambda Demo
+# Python Lambda OpenAI Demo
 
 Three AWS Lambda (Python) functions showing different approaches to integrating OpenAI with Datadog monitoring, with a focus on PII (Personally Identifiable Information) handling.
 
@@ -97,7 +97,7 @@ Resources:
 
 ## 日本語
 
-# Lambda デモ
+# Python Lambda OpenAI デモ
 
 OpenAI と Datadog モニタリングを統合するさまざまなアプローチを示す、3 つの AWS Lambda（Python）関数です。PII（個人を特定できる情報）の取り扱いに焦点を当てています。
 
@@ -190,7 +190,7 @@ Resources:
 
 ## 繁體中文
 
-# Lambda 示範
+# Python Lambda OpenAI 示範
 
 三個 AWS Lambda（Python）函式，展示整合 OpenAI 與 Datadog 監控的不同方式，並聚焦於 PII（個人可識別資訊）的處理。
 
