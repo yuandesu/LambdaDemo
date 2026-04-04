@@ -1,97 +1,84 @@
-# AWS Lambda ¥Ç¥â¥×¥í¥¸¥§¥¯¥È
+# Lambda Demo
 
-AWS Lambda´Ø¿ô¤Î¥Ç¥â¥×¥í¥¸¥§¥¯¥È¤Ç¤¹¡£Datadog´Æ»ëÅý¹ç¤Î¼ÂÁõÎã¤ò´Þ¤ß¤Þ¤¹¡£
+Three AWS Lambda (Python) functions showing different approaches to integrating OpenAI with Datadog monitoring, with a focus on PII (Personally Identifiable Information) handling.
 
-## ¥Õ¥¡¥¤¥ë¹½À®
+## Functions
 
-| ¥Õ¥¡¥¤¥ë | ÀâÌÀ |
-|---------|------|
-| `HelloWorldDemo.py` | ´ðËÜÅª¤ÊLambda´Ø¿ô¤Î¥µ¥ó¥×¥ë |
-| `MockPIIAPI.py` | UDP¤ÇDatadog¥á¥È¥ê¥¯¥¹¤ò¼êÆ°Á÷¿®¤¹¤ë¥â¥Ã¥¯API |
-| `MockPIIAPI_Tracer.py` | Datadog SDK¼«Æ°¥È¥ì¡¼¥·¥ó¥°ÉÕ¤­¤Î³ÈÄ¥ÈÇ |
+| File | Description |
+|---|---|
+| `HelloWorldDemo.py` | Minimal Lambda function â€” a clean template to start from |
+| `MockPIIAPI.py` | Returns mock user data (with PII) and sends metrics to Datadog via UDP; no SDK required |
+| `MockPIIAPI_Tracer.py` | Full Datadog SDK integration using `@tracer.wrap()` and `@datadog_lambda_wrapper` |
 
-## µ¡Ç½¾ÜºÙ
+## Prerequisites
 
-### HelloWorldDemo.py
+- AWS account with CLI configured (`aws configure`)
+- [Datadog](https://app.datadoghq.com) account and API key
+- OpenAI API key
 
-ºÇ¤â¥·¥ó¥×¥ë¤ÊLambda´Ø¿ô¤ÎÎã¤Ç¤¹¡£
+## Deploy to AWS Lambda
 
-```python
-# ¥ì¥¹¥Ý¥ó¥¹Îã
-{
-    "statusCode": 200,
-    "body": {
-        "message": "Hello World!",
-        "request_id": "<aws_request_id>"
-    }
-}
-```
-
-### MockPIIAPI.py
-
-¥À¥ß¡¼¥æ¡¼¥¶¡¼¥Ç¡¼¥¿¤òÀ¸À®¤¹¤ë¥â¥Ã¥¯API¤Ç¤¹¡£
-
-**ÆÃÄ§:**
-- ¥é¥ó¥À¥à¤Ê¥æ¡¼¥¶¡¼¾ðÊó¡ÊÌ¾Á°¡¢¥á¡¼¥ë¡¢Ç¯Îð¡¢Ìò³ä¡¢¥¹¥Æ¡¼¥¿¥¹¡Ë¤òÀ¸À®
-- UDP·ÐÍ³¤ÇDatadog Extension¤Ë¥á¥È¥ê¥¯¥¹¤ò¼êÆ°Á÷¿®
-- URL¥Ñ¥é¥á¡¼¥¿ `?count=N` ¤ÇÀ¸À®·ï¿ô¤ò»ØÄê²ÄÇ½¡ÊºÇÂç100·ï¡Ë
-
-**Á÷¿®¥á¥È¥ê¥¯¥¹:**
-- `mock_api.users.generated` - À¸À®¤·¤¿¥æ¡¼¥¶¡¼¿ô
-- `mock_api.batch_size` - ¥Ð¥Ã¥Á¥µ¥¤¥º
-
-### MockPIIAPI_Tracer.py
-
-Datadog¸ø¼°SDK¤ò»ÈÍÑ¤·¤¿¹âÅÙ¤Ê´Æ»ëµ¡Ç½ÉÕ¤­¥Ð¡¼¥¸¥ç¥ó¤Ç¤¹¡£
-
-**ÆÃÄ§:**
-- `@tracer.wrap()` ¥Ç¥³¥ì¡¼¥¿¤Ë¤è¤ë¼«Æ°¥È¥ì¡¼¥·¥ó¥°
-- `@datadog_lambda_wrapper` ¤Ë¤è¤ëLambda¥é¥¤¥Õ¥µ¥¤¥¯¥ë´ÉÍý
-- `lambda_metric()` ¤Ë¤è¤ë¸ø¼°SDK¥á¥È¥ê¥¯¥¹Á÷¿®
-- ¥«¥¹¥¿¥àSpan¥¿¥°¡Ê`request.id`, `generation.count`¡Ë
-
-## DatadogÅý¹ç
-
-### É¬Í×¤ÊDatadog Lambda Layer
-
-```
-arn:aws:lambda:<region>:464622532012:layer:Datadog-Python<version>:<layer_version>
-arn:aws:lambda:<region>:464622532012:layer:Datadog-Extension:<layer_version>
-```
-
-### ´Ä¶­ÊÑ¿ô
-
-| ÊÑ¿ôÌ¾ | ÀâÌÀ |
-|--------|------|
-| `DD_API_KEY` | Datadog API¥­¡¼ |
-| `DD_SITE` | Datadog¥µ¥¤¥È¡ÊÎã: `datadoghq.com`¡Ë |
-| `DD_SERVICE` | ¥µ¡¼¥Ó¥¹Ì¾ |
-| `DD_ENV` | ´Ä¶­Ì¾¡Êproduction, stagingÅù¡Ë |
-| `DD_TRACE_ENABLED` | ¥È¥ì¡¼¥¹Í­¸ú²½¡Ê`true`/`false`¡Ë |
-
-## ¥Ç¥×¥í¥¤ÊýË¡
-
-### AWS CLI¤ò»ÈÍÑ¤¹¤ë¾ì¹ç
+### 1. Package and upload
 
 ```bash
-# ZIP¥Õ¥¡¥¤¥ë¤òºîÀ®
 zip function.zip MockPIIAPI_Tracer.py
-
-# Lambda´Ø¿ô¤ò¹¹¿·
 aws lambda update-function-code \
-    --function-name <function-name> \
-    --zip-file fileb://function.zip
+  --function-name <your-function-name> \
+  --zip-file fileb://function.zip
 ```
 
-### AWS SAM¤ò»ÈÍÑ¤¹¤ë¾ì¹ç
+### 2. Attach the Datadog Lambda Layers
+
+In the Lambda console, add these layers for your region:
+
+```
+arn:aws:lambda:<region>:464622532012:layer:Datadog-Python311:<version>
+arn:aws:lambda:<region>:464622532012:layer:Datadog-Extension:<version>
+```
+
+Find the latest layer versions at [docs.datadoghq.com/serverless](https://docs.datadoghq.com/serverless/libraries_integrations/extension/).
+
+### 3. Set environment variables in the Lambda console
+
+| Variable | Value |
+|---|---|
+| `DD_API_KEY` | Your Datadog API key |
+| `DD_SITE` | `datadoghq.com` |
+| `DD_SERVICE` | `lambda-demo` |
+| `DD_ENV` | `production` |
+| `OPENAI_API_KEY` | Your OpenAI API key |
+
+### 4. Invoke and verify
+
+```bash
+# Generate 1 mock user record
+aws lambda invoke --function-name <your-function-name> out.json && cat out.json
+
+# Generate 10 records
+aws lambda invoke \
+  --function-name <your-function-name> \
+  --payload '{"queryStringParameters": {"count": "10"}}' \
+  --cli-binary-format raw-in-base64-out \
+  out.json && cat out.json
+```
+
+Open [Datadog APM â†’ Traces](https://app.datadoghq.com/apm/traces) to see the traces.
+
+## Local Testing
+
+```bash
+pip install datadog ddtrace openai datadog-lambda
+python HelloWorldDemo.py
+```
+
+## AWS SAM (optional)
 
 ```yaml
 # template.yaml
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-
 Resources:
-  MockPIIAPIFunction:
+  LambdaDemoFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: MockPIIAPI_Tracer.lambda_handler
@@ -99,38 +86,3 @@ Resources:
       Timeout: 30
       MemorySize: 256
 ```
-
-## »ÈÍÑÎã
-
-### Function URL¤Ç¤Î¸Æ¤Ó½Ð¤·
-
-```bash
-# 1·ï¤Î¥À¥ß¡¼¥Ç¡¼¥¿¤òÀ¸À®
-curl https://<function-url>/
-
-# 10·ï¤Î¥À¥ß¡¼¥Ç¡¼¥¿¤òÀ¸À®
-curl "https://<function-url>/?count=10"
-```
-
-### ¥ì¥¹¥Ý¥ó¥¹Îã
-
-```json
-{
-    "meta": {
-        "count": 1,
-        "method": "Datadog SDK (Auto)"
-    },
-    "data": [
-        {
-            "id": 1234,
-            "name": "James Smith",
-            "email": "james.smith@gmail.com",
-            "created_at": 1705849200
-        }
-    ]
-}
-```
-
-## ¥é¥¤¥»¥ó¥¹
-
-MIT License
