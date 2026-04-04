@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>python-lambda-openai-demo</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0f5;color:#1a1a1a;min-height:100vh}
+header{background:#632CA6;color:#fff;padding:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(99,44,166,.35)}
+.header-inner{max-width:900px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.repo-title{font-size:1.05rem;font-weight:700;letter-spacing:.3px;opacity:.95}
+.lang-btns{display:flex;gap:6px}
+.lang-btn{border:2px solid rgba(255,255,255,.55);background:transparent;color:#fff;padding:5px 14px;border-radius:999px;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .18s;white-space:nowrap}
+.lang-btn:hover{background:rgba(255,255,255,.18)}
+.lang-btn.active{background:#fff;color:#632CA6;border-color:#fff}
+main{max-width:900px;margin:0 auto;padding:32px 20px 60px}
+[data-lang]{display:none}
+[data-lang].visible{display:block}
+.page-hero{background:linear-gradient(135deg,#632CA6 0%,#7952CC 100%);color:#fff;border-radius:16px;padding:36px 32px;margin-bottom:28px;box-shadow:0 4px 24px rgba(99,44,166,.22)}
+.page-hero h1{font-size:1.7rem;font-weight:800;margin-bottom:8px;line-height:1.25}
+.page-hero .subtitle{opacity:.88;font-size:1rem;line-height:1.55}
+.card{background:#fff;border-radius:14px;padding:28px 30px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid #e8e4f0}
+.card h2{font-size:1.13rem;font-weight:700;color:#632CA6;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h2 .icon{font-size:1.1em}
+.card p{line-height:1.7;color:#333;margin-bottom:10px}
+.card p:last-child{margin-bottom:0}
+.card ul{margin:8px 0 0 18px;line-height:1.8;color:#333}
+.card ul li{margin-bottom:4px}
+.card ul li strong{color:#632CA6}
+pre{background:#1e1e2e;color:#cdd6f4;border-radius:10px;padding:18px 20px;font-size:.84rem;overflow-x:auto;margin:12px 0;line-height:1.6;font-family:'SF Mono','Fira Code',monospace}
+code{background:#f0eaf8;color:#632CA6;border-radius:4px;padding:1px 6px;font-size:.87em;font-family:'SF Mono','Fira Code',monospace}
+.arch-wrap{background:#f8f6fc;border-radius:12px;padding:24px 20px;margin:14px 0;overflow-x:auto}
+.arch{display:flex;align-items:center;justify-content:flex-start;gap:0;flex-wrap:wrap;min-width:fit-content}
+.arch-col{display:flex;flex-direction:column;align-items:center;gap:8px}
+.box{background:#fff;border:2px solid #7952CC;border-radius:10px;padding:10px 14px;font-size:.8rem;font-weight:600;color:#632CA6;text-align:center;white-space:nowrap;box-shadow:0 2px 6px rgba(121,82,204,.12);min-width:90px}
+.box.green{border-color:#2da84e;color:#1a7a38}
+.box.blue{border-color:#0066cc;color:#004a99}
+.box.orange{border-color:#e0720c;color:#b35800}
+.box.gray{border-color:#888;color:#555}
+.box.red{border-color:#cc2222;color:#991111}
+.arrow{font-size:1.3rem;color:#7952CC;padding:0 6px;font-weight:700;align-self:center}
+.arrow-label{font-size:.72rem;color:#888;text-align:center;margin-top:2px}
+.arrow-col{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.arch-row{display:flex;align-items:center;gap:0;margin-bottom:8px;flex-wrap:wrap}
+.badge{display:inline-block;background:#f0eaf8;color:#632CA6;border-radius:6px;padding:2px 9px;font-size:.78rem;font-weight:600;margin:2px 3px}
+.qs-steps{counter-reset:step}
+.qs-steps li{list-style:none;margin-bottom:10px;padding-left:36px;position:relative;line-height:1.6}
+.qs-steps li::before{content:counter(step);counter-increment:step;position:absolute;left:0;top:0;background:#632CA6;color:#fff;width:24px;height:24px;border-radius:50%;font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.see-tag{display:inline-block;background:#632CA6;color:#fff;border-radius:6px;padding:3px 10px;font-size:.8rem;margin:2px 3px;font-weight:500}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <span class="repo-title">python-lambda-openai-demo</span>
+    <div class="lang-btns">
+      <button class="lang-btn active" onclick="setLang('en',this)">English</button>
+      <button class="lang-btn" onclick="setLang('ja',this)">日本語</button>
+      <button class="lang-btn" onclick="setLang('zh',this)">繁體中文</button>
+    </div>
+  </div>
+</header>
+<main>
+
+<div data-lang="en">
+<div class="page-hero">
+  <h1>python-lambda-openai-demo</h1>
+  <p class="subtitle">Monitor OpenAI API calls inside AWS Lambda with Datadog — including PII awareness.</p>
+</div>
+<div class="card">
+  <h2><span class="icon">🎯</span>Purpose</h2>
+  <p>This demo shows how to instrument AWS Lambda functions that call OpenAI, using Datadog's Lambda Extension for tracing and metrics collection — without a traditional sidecar agent.</p>
+  <p><strong>The core problem:</strong> Serverless functions run in ephemeral containers managed by AWS. You can't install a persistent Datadog Agent alongside them. Datadog solves this with a Lambda Extension — a lightweight process that runs in the same Lambda execution environment, collecting traces and metrics without needing a separate container.</p>
+</div>
+<div class="card">
+  <h2><span class="icon">🏗️</span>How It Works — Architecture</h2>
+  
+<div class="arch-wrap">
+  <div class="arch-row">
+    <div class="box gray">AWS API Gateway</div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">invoke</div></div>
+    <div class="box green">Lambda Function<br><small>Python</small></div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">API call</div></div>
+    <div class="box blue">OpenAI API<br><small>GPT model</small></div>
+  </div>
+  <div class="arch-row" style="margin-top:8px">
+    <div style="width:120px"></div>
+    <div style="width:40px"></div>
+    <div class="box orange">Datadog Lambda<br>Extension<br><small>same env</small></div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">HTTPS</div></div>
+    <div class="box" style="border-color:#632CA6;color:#632CA6">Datadog Backend</div>
+  </div>
+</div>
+  <p>The Lambda Extension is included as a Lambda Layer. It starts alongside your function handler and intercepts telemetry before the execution environment shuts down. The <code>@tracer.wrap()</code> decorator creates APM spans around any Python function automatically.</p>
+</div>
+<div class="card">
+  <h2><span class="icon">💡</span>Key Concepts</h2>
+  <ul>
+    <li><strong>Lambda Extension:</strong> A sidecar process running in the Lambda execution environment — collects traces and metrics without a separate container.</li>
+    <li><strong>Lambda Layer:</strong> A ZIP package containing the Datadog tracer library + extension binary, attached to your function.</li>
+    <li><strong>@tracer.wrap():</strong> A Python decorator that automatically creates an APM span for any function — start time, end time, errors, all captured.</li>
+    <li><strong>PII (Personally Identifiable Information):</strong> Data like emails or names that must not appear in traces unmasked. This demo shows how to handle it.</li>
+    <li><strong>MockPIIAPI vs MockPIIAPI_Tracer:</strong> Two versions — one uses UDP metrics without the SDK, the other uses the full tracer SDK with <code>@tracer.wrap</code>.</li>
+  </ul>
+</div>
+<div class="card">
+  <h2><span class="icon">🚀</span>Quick Start</h2>
+  <ol class="qs-steps">
+    <li>Package the function: <pre>zip function.zip MockPIIAPI_Tracer.py</pre></li>
+    <li>Deploy to Lambda: <pre>aws lambda update-function-code --function-name your-fn --zip-file fileb://function.zip</pre></li>
+    <li>Add the Datadog Lambda Layer to your function in the AWS console.</li>
+    <li>Set environment variables: <code>DD_API_KEY</code>, <code>DD_SITE</code>, <code>DD_TRACE_ENABLED=true</code></li>
+    <li>Invoke the function and check Datadog APM.</li>
+  </ol>
+</div>
+<div class="card">
+  <h2><span class="icon">📊</span>What You'll See in Datadog</h2>
+  <p>Go to <strong>APM → Traces</strong> and filter:</p>
+  <span class="see-tag">service:lambda-demo</span>
+  <p style="margin-top:10px">You'll see spans for the Lambda invocation and child spans for each OpenAI API call wrapped with <code>@tracer.wrap()</code>.</p>
+</div>
+</div>
+<div data-lang="ja">
+<div class="page-hero">
+  <h1>python-lambda-openai-demo</h1>
+  <p class="subtitle">DatadogのLambda Extensionを使ってAWS LambdaのOpenAI呼び出しを監視します（PII対応含む）。</p>
+</div>
+<div class="card">
+  <h2><span class="icon">🎯</span>目的</h2>
+  <p>このデモは、Datadog Lambda ExtensionでOpenAIを呼び出すAWS Lambda関数を計装する方法を示します。従来のサイドカーエージェントは不要です。</p>
+  <p><strong>核心的な問題:</strong> サーバーレス関数はAWSが管理するエフェメラルコンテナで動作します。永続的なDatadogエージェントをインストールできません。Lambda Extensionは同じLambda実行環境内で動作する軽量プロセスで、別コンテナなしでトレースとメトリクスを収集します。</p>
+</div>
+<div class="card">
+  <h2><span class="icon">🏗️</span>仕組み — アーキテクチャ</h2>
+  
+<div class="arch-wrap">
+  <div class="arch-row">
+    <div class="box gray">AWS API Gateway</div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">invoke</div></div>
+    <div class="box green">Lambda Function<br><small>Python</small></div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">API call</div></div>
+    <div class="box blue">OpenAI API<br><small>GPT model</small></div>
+  </div>
+  <div class="arch-row" style="margin-top:8px">
+    <div style="width:120px"></div>
+    <div style="width:40px"></div>
+    <div class="box orange">Datadog Lambda<br>Extension<br><small>same env</small></div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">HTTPS</div></div>
+    <div class="box" style="border-color:#632CA6;color:#632CA6">Datadog Backend</div>
+  </div>
+</div>
+  <p>Lambda ExtensionはLambda Layerとして含まれています。関数ハンドラーと同時に起動し、実行環境がシャットダウンする前にテレメトリをインターセプトします。<code>@tracer.wrap()</code>デコレーターで任意のPython関数にAPMスパンを自動生成できます。</p>
+</div>
+<div class="card">
+  <h2><span class="icon">💡</span>重要な概念</h2>
+  <ul>
+    <li><strong>Lambda Extension:</strong> Lambda実行環境内で動くサイドカープロセス。別コンテナなしでトレースとメトリクスを収集します。</li>
+    <li><strong>Lambda Layer:</strong> DatadogトレーサーライブラリとExtensionバイナリを含むZIPパッケージ。</li>
+    <li><strong>@tracer.wrap():</strong> 任意の関数のAPMスパンを自動生成するPythonデコレーター。</li>
+    <li><strong>PII（個人識別情報）:</strong> メールや名前など、マスクせずにトレースに含めてはいけないデータ。</li>
+    <li><strong>MockPIIAPI vs MockPIIAPI_Tracer:</strong> 2つのバージョン — UDPメトリクスのみとフルSDK（<code>@tracer.wrap</code>）。</li>
+  </ul>
+</div>
+<div class="card">
+  <h2><span class="icon">🚀</span>クイックスタート</h2>
+  <ol class="qs-steps">
+    <li>関数をパッケージ: <pre>zip function.zip MockPIIAPI_Tracer.py</pre></li>
+    <li>Lambdaにデプロイ: <pre>aws lambda update-function-code --function-name your-fn --zip-file fileb://function.zip</pre></li>
+    <li>AWSコンソールでDatadog Lambda Layerを追加します。</li>
+    <li>環境変数を設定: <code>DD_API_KEY</code>、<code>DD_SITE</code>、<code>DD_TRACE_ENABLED=true</code></li>
+    <li>関数を呼び出してDatadog APMを確認します。</li>
+  </ol>
+</div>
+<div class="card">
+  <h2><span class="icon">📊</span>Datadogで確認できること</h2>
+  <p><strong>APM → トレース</strong>でフィルタリング:</p>
+  <span class="see-tag">service:lambda-demo</span>
+  <p style="margin-top:10px">Lambda呼び出しのスパンと、<code>@tracer.wrap()</code>でラップされた各OpenAI API呼び出しの子スパンが表示されます。</p>
+</div>
+</div>
+<div data-lang="zh">
+<div class="page-hero">
+  <h1>python-lambda-openai-demo</h1>
+  <p class="subtitle">使用 Datadog Lambda Extension 監控 AWS Lambda 中的 OpenAI API 呼叫，包括 PII 處理。</p>
+</div>
+<div class="card">
+  <h2><span class="icon">🎯</span>目的</h2>
+  <p>本示範展示如何使用 Datadog Lambda Extension 對呼叫 OpenAI 的 AWS Lambda 函數進行追蹤和指標收集，無需傳統的 sidecar agent。</p>
+  <p><strong>核心問題：</strong>無伺服器函數在 AWS 管理的短暫容器中運行，無法安裝持久的 Datadog Agent。Lambda Extension 是在同一 Lambda 執行環境中運行的輕量程序，無需獨立容器即可收集追蹤和指標。</p>
+</div>
+<div class="card">
+  <h2><span class="icon">🏗️</span>運作方式 — 架構</h2>
+  
+<div class="arch-wrap">
+  <div class="arch-row">
+    <div class="box gray">AWS API Gateway</div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">invoke</div></div>
+    <div class="box green">Lambda Function<br><small>Python</small></div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">API call</div></div>
+    <div class="box blue">OpenAI API<br><small>GPT model</small></div>
+  </div>
+  <div class="arch-row" style="margin-top:8px">
+    <div style="width:120px"></div>
+    <div style="width:40px"></div>
+    <div class="box orange">Datadog Lambda<br>Extension<br><small>same env</small></div>
+    <div class="arrow-col"><div class="arrow">→</div><div class="arrow-label">HTTPS</div></div>
+    <div class="box" style="border-color:#632CA6;color:#632CA6">Datadog Backend</div>
+  </div>
+</div>
+  <p>Lambda Extension 作為 Lambda Layer 包含在函數中。它與函數處理程序同時啟動，在執行環境關閉前攔截遙測資料。<code>@tracer.wrap()</code> 裝飾器自動為任何 Python 函數建立 APM span。</p>
+</div>
+<div class="card">
+  <h2><span class="icon">💡</span>核心概念</h2>
+  <ul>
+    <li><strong>Lambda Extension：</strong>在 Lambda 執行環境中運行的 sidecar 程序，無需獨立容器即可收集追蹤和指標。</li>
+    <li><strong>Lambda Layer：</strong>包含 Datadog tracer 函式庫和 Extension 二進位的 ZIP 套件，附加到您的函數。</li>
+    <li><strong>@tracer.wrap()：</strong>自動為任何函數建立 APM span 的 Python 裝飾器。</li>
+    <li><strong>PII（個人識別資訊）：</strong>電子郵件或姓名等不應在追蹤中以明文出現的資料。</li>
+    <li><strong>MockPIIAPI vs MockPIIAPI_Tracer：</strong>兩個版本——僅 UDP 指標與完整 SDK（包含 <code>@tracer.wrap</code>）。</li>
+  </ul>
+</div>
+<div class="card">
+  <h2><span class="icon">🚀</span>快速開始</h2>
+  <ol class="qs-steps">
+    <li>打包函數：<pre>zip function.zip MockPIIAPI_Tracer.py</pre></li>
+    <li>部署到 Lambda：<pre>aws lambda update-function-code --function-name your-fn --zip-file fileb://function.zip</pre></li>
+    <li>在 AWS 主控台將 Datadog Lambda Layer 新增到您的函數。</li>
+    <li>設定環境變數：<code>DD_API_KEY</code>、<code>DD_SITE</code>、<code>DD_TRACE_ENABLED=true</code></li>
+    <li>呼叫函數並查看 Datadog APM。</li>
+  </ol>
+</div>
+<div class="card">
+  <h2><span class="icon">📊</span>在 Datadog 中會看到什麼</h2>
+  <p>前往 <strong>APM → Traces</strong> 並篩選：</p>
+  <span class="see-tag">service:lambda-demo</span>
+  <p style="margin-top:10px">您將看到 Lambda 呼叫的 span 以及每個用 <code>@tracer.wrap()</code> 包裝的 OpenAI API 呼叫的子 span。</p>
+</div>
+</div>
+</main>
+<script>
+function setLang(lang,btn){
+  document.querySelectorAll('[data-lang]').forEach(el=>el.classList.remove('visible'));
+  document.querySelectorAll('[data-lang="'+lang+'"]').forEach(el=>el.classList.add('visible'));
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('[data-lang="en"]').forEach(el=>el.classList.add('visible'));
+});
+</script>
+</body>
+</html>
