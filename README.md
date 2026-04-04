@@ -1,4 +1,5 @@
 [English](#english) | [日本語](#日本語) | [繁體中文](#繁體中文)
+🌐 **[Interactive Guide →](https://yuandesu.github.io/python-lambda-openai-demo/)**
 
 ---
 
